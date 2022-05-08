@@ -24,6 +24,7 @@ class ZHtml extends Html
 
     public static function enumItem($model,$attribute) {
         preg_match('/\((.*)\)/',$model->tableSchema->columns[$attribute]->dbType,$matches);
+        $values['']=\Yii::t('enumItem','');
         foreach(explode("','", $matches[1]) as $value) {
             $value=str_replace("'",null,$value);
             $values[$value]=\Yii::t('enumItem',$value);
