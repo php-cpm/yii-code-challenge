@@ -152,6 +152,7 @@ $('#export-btn').on('click', function(){
     jQinput2.attr(\"value\",isChecked);
     $('#csv-download').append(jQinput2);
     jQform.submit();
+    jQform.remove();
 });",View::POS_READY);
 
 
