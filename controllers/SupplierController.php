@@ -175,7 +175,7 @@ class SupplierController extends Controller
         $data = json_decode($data,true);
         $name = $data['SupplierSearch']['name'] ?? '';
         $code = $data['SupplierSearch']['code'] ?? '';
-        $t_status = $data['SupplierSearch']['code'] ?? '';
+        $t_status = $data['SupplierSearch']['t_status'] ?? '';
         $id = $data['SupplierSearch']['id'] ?? '';
 
         $query = SupplierSearch::find();
