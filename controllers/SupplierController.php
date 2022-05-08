@@ -43,7 +43,11 @@ class SupplierController extends Controller
     public function actionIndex()
     {
         $searchModel = new SupplierSearch();
+
         $dataProvider = $searchModel->search($this->request->queryParams);
+
+        $dataProvider->pagination->pageSize=5;
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
