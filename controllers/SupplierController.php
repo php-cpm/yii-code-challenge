@@ -166,15 +166,23 @@ class SupplierController extends Controller
 //        print_r($this->request->getBodyParams());exit;
         $getAll = $this->request->getBodyParam('checkall', false);
         $getIds = $this->request->getBodyParam('rows', '');
+        $data = $this->request->getBodyParam('data', '');
         $getIds = json_decode($getIds,true);
-        $name = $this->request->getBodyParam('name');
-        $code = $this->request->getBodyParam('code');
-        $t_status = $this->request->getBodyParam('t_status');
+        $data = json_decode($data,true);
+        $name = $data['SupplierSearch']['name'] ?? '';
+        $code = $data['SupplierSearch']['code'] ?? '';
+        $t_status = $data['SupplierSearch']['code'] ?? '';
+        $id = $data['SupplierSearch']['id'] ?? '';
 
         $query = SupplierSearch::find();
         $query->andFilterWhere(['like', 'name', $name])
             ->andFilterWhere(['like', 'code', $code])
             ->andFilterWhere(['like', 't_status', $t_status]);
+
+        // grid filtering conditions
+        $operator = SupplierSearch::getOperator($id);
+        $query->andFilterWhere([$operator, 'id', str_replace($operator,'',$id)]);
+
         if ($getAll != true) {
             $query->andFilterWhere(['in', 'id', $getIds]);
         }

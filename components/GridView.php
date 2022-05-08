@@ -131,9 +131,20 @@ $('#export-btn').on('click', function(){
     }
     var isChecked = jQuery('#ExportAllIsChecked').val();
     var url = '$exportAction';
-    var jQform = $(\"<form id='csv-download' style='display: none;' method='post' target='_blank'></form>\");
+    var jQform = $(\"<form id='csv-download' style='display: none;' method='post'></form>\");
     jQform.attr(\"action\",url);
     $('body').append(jQform);
+    var settings = jQuery('#$id').yiiGridView('data').settings
+    var data = {};
+    $.each($(settings.filterSelector).serializeArray(), function () {
+        if (!(this.name in data)) {
+            data[this.name] = [];
+        }
+        data[this.name].push(this.value);
+    });
+    var jQinput1 = $(\"<input name='data' type='text' />\");
+    jQinput1.attr(\"value\",JSON.stringify(data));
+    $(\"#csv-download\").append(jQinput1);
     var jQinput1 = $(\"<input name='rows' type='text' />\");
     jQinput1.attr(\"value\",JSON.stringify(rows));
     $(\"#csv-download\").append(jQinput1);

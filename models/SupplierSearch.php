@@ -52,22 +52,21 @@ class SupplierSearch extends Supplier
 
 
         // grid filtering conditions
-        $operator = $this->getOperator($this->id);
-        $this->id = str_replace($operator,'',$this->id);
-        $query->andFilterWhere([$operator, 'id', $this->id]);
+        $operator = self::getOperator($this->id);
+        $query->andFilterWhere([$operator, 'id', str_replace($operator,'',$this->id)]);
 
-        if (!$this->validate()) {
+//        if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
-            return $dataProvider;
-        }
+//            return $dataProvider;
+//        }
         $query->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'code', $this->code])
             ->andFilterWhere(['like', 't_status', $this->t_status]);
 
         return $dataProvider;
     }
-    private function getOperator($qryString){
+    public static function getOperator($qryString){
         switch ($qryString){
             case strpos($qryString,'<>') === 0:
                 $operator = '<>';
