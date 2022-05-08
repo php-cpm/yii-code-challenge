@@ -4,15 +4,19 @@ namespace app\controllers;
 
 use app\models\Supplier;
 use app\models\SupplierSearch;
+use yii\data\ActiveDataProvider;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii2tech\csvgrid\CsvGrid;
 
 /**
  * SupplierController implements the CRUD actions for Supplier model.
  */
 class SupplierController extends Controller
 {
+    public $enableCsrfValidation = false;
     /**
      * @inheritDoc
      */
@@ -47,18 +51,44 @@ class SupplierController extends Controller
         ]);
     }
 
+    public function actionSearchCode()
+    {
+        $listdata = SupplierSearch::find()
+            ->andFilterWhere(['like', 'code', $this->request->queryParams['query']])
+            ->select(['code as value', 'code as label'])
+            ->distinct('code')
+            ->asArray()
+            ->all();
+
+
+        return $this->asJson(['listdata' => $listdata]);
+    }
+
+    public function actionSearchName()
+    {
+        $listdata = SupplierSearch::find()
+            ->andFilterWhere(['like', 'name', $this->request->queryParams['query']])
+            ->select(['name as value', 'name as label'])
+            ->distinct('name')
+            ->asArray()
+            ->all();
+
+
+        return $this->asJson(['listdata' => $listdata]);
+    }
+
     /**
      * Displays a single Supplier model.
      * @param int $id ID
      * @return string
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
+//    public function actionView($id)
+//    {
+//        return $this->render('view', [
+//            'model' => $this->findModel($id),
+//        ]);
+//    }
 
     /**
      * Creates a new Supplier model.
@@ -71,7 +101,7 @@ class SupplierController extends Controller
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+                return $this->redirect(['index']);
             }
         } else {
             $model->loadDefaultValues();
@@ -89,18 +119,18 @@ class SupplierController extends Controller
      * @return string|\yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('update', [
-            'model' => $model,
-        ]);
-    }
+//    public function actionUpdate($id)
+//    {
+//        $model = $this->findModel($id);
+//
+//        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+//            return $this->redirect(['view', 'id' => $model->id]);
+//        }
+//
+//        return $this->render('update', [
+//            'model' => $model,
+//        ]);
+//    }
 
     /**
      * Deletes an existing Supplier model.
@@ -109,12 +139,12 @@ class SupplierController extends Controller
      * @return \yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
-    }
+//    public function actionDelete($id)
+//    {
+//        $this->findModel($id)->delete();
+//
+//        return $this->redirect(['index']);
+//    }
 
     /**
      * Finds the Supplier model based on its primary key value.
@@ -129,6 +159,34 @@ class SupplierController extends Controller
             return $model;
         }
 
-        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+        throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
+    }
+
+    public function actionExport()
+    {
+//        print_r($this->request->getBodyParams());exit;
+        $getAll = $this->request->getBodyParam('checkall', false);
+        $getIds = $this->request->getBodyParam('rows', '');
+        $getIds = json_decode($getIds,true);
+        $name = $this->request->getBodyParam('name');
+        $code = $this->request->getBodyParam('code');
+        $t_status = $this->request->getBodyParam('t_status');
+
+        $query = SupplierSearch::find();
+        $query->andFilterWhere(['like', 'name', $name])
+            ->andFilterWhere(['like', 'code', $code])
+            ->andFilterWhere(['like', 't_status', $t_status]);
+        if ($getAll != true) {
+            $query->andFilterWhere(['in', 'id', $getIds]);
+        }
+        if (empty($getIds)) {
+            throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
+        }
+        $exporter = new CsvGrid([
+            'dataProvider' => new ActiveDataProvider([
+                'query' => $query,
+            ]),
+        ]);
+        return $exporter->export()->send(sprintf('suppliers%s.csv',date("YmdHis")));
     }
 }

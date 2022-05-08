@@ -13,18 +13,36 @@ use yii\widgets\ActiveForm;
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
         'method' => 'get',
+//        'enableAjaxValidation'=>false,
+        'fieldConfig' => [
+            'template' => "{label}\n<div class=\"col-lg-2\">{input}</div>",
+//            'labelOptions' => ['class' => 'col-lg-2'],
+        ],
         'options' => [
-            'data-pjax' => 1
+            'class'=>'form-inline',
+            'data-pjax' => 1,
         ],
     ]); ?>
 
-    <?= $form->field($model, 'id') ?>
+    <?= $form->field($model, 'id')->dropdownList([
+        '1' => '<10',
+        '2' => '>10'
+    ],
+        ['prompt'=>'Select']) ?>
 
-    <?= $form->field($model, 'name') ?>
+    <?= $form->field($model, 'name')->textInput([
+        'option' => ['maxlength' => true]
+    ]) ?>
 
-    <?= $form->field($model, 'code') ?>
+    <?= $form->field($model, 'code')->textInput([
+            'option' => ['maxlength' => true]
+    ]) ?>
 
-    <?= $form->field($model, 't_status') ?>
+    <?= $form->field($model, 't_status')->dropDownList([
+        'ok' => 'ok',
+        'hold' => 'hold'
+    ],
+        ['prompt'=>'Select']) ?>
 
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
