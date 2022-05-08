@@ -50,21 +50,50 @@ class SupplierSearch extends Supplier
 
         $this->load($params);
 
+
+        // grid filtering conditions
+        $operator = $this->getOperator($this->id);
+        $this->id = str_replace($operator,'',$this->id);
+        $query->andFilterWhere([$operator, 'id', $this->id]);
+
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
         }
-
-        // grid filtering conditions
-        $query->andFilterWhere([
-            'id' => $this->id,
-        ]);
-
         $query->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'code', $this->code])
             ->andFilterWhere(['like', 't_status', $this->t_status]);
 
         return $dataProvider;
+    }
+    private function getOperator($qryString){
+        switch ($qryString){
+            case strpos($qryString,'<>') === 0:
+                $operator = '<>';
+                break;
+            case strpos($qryString,'!=') === 0:
+                $operator = '!=';
+                break;
+            case strpos($qryString,'>=') === 0:
+                $operator = '>=';
+                break;
+            case strpos($qryString,'<=') === 0:
+                $operator = '<=';
+                break;
+            case strpos($qryString,'=') === 0:
+                $operator = '=';
+                break;
+            case strpos($qryString,'>') === 0:
+                $operator = '>';
+                break;
+            case strpos($qryString,'<') === 0:
+                $operator = '<';
+                break;
+            default:
+                $operator =  'like';
+                break;
+        }
+        return $operator;
     }
 }

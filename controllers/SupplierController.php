@@ -44,7 +44,6 @@ class SupplierController extends Controller
     {
         $searchModel = new SupplierSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
-
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,

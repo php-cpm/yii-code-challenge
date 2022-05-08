@@ -46,7 +46,38 @@ $this->params['breadcrumbs'][] = $this->title;
                 'contentOptions' => ['align'=>'center'],
 
             ],
-            'id',
+            [
+                'attribute' => 'id',
+                'value' => 'id',
+                'filter' => \yii\jui\AutoComplete::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'id',
+                    'clientOptions' => [
+                        'minLength' => 1,
+                        'autoFill' => true,
+                        'source' => new \yii\web\JsExpression('
+function(request, response) {
+var suggestions = [];
+var term = (request.term).match(/\d+/g)[0] || \'\'
+jQuery.each([\'=\',\'>\',\'>=\',\'<\',\'<=\',\'!=\',], function(index, ele) {
+    suggestions.push({
+        label: ele + term,
+        value: ele + term
+    });
+});
+response(suggestions);
+}'
+                        ),
+                        'select' => new \yii\web\JsExpression('
+        function(event, ui) {
+            jQuery("#'.Html::getInputId($searchModel, 'id').'")
+                .val(ui.item.value);
+            jQuery("#supplier-table").yiiGridView("applyFilter");
+            }'
+                        )
+                    ]
+                ]),
+            ],
             [
                 'attribute' => 'name',
                 'value' => 'name',
